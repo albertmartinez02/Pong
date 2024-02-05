@@ -1,0 +1,42 @@
+|                         |
+|                         |
+ *                       *
+  \                     /
+   \                   /
+    \                 /
+     \               /
+
+
+
+     /               \
+    /                 \
+   /                   \
+  /                     \
+ *                       *
+|                         |
+|                         |
+
+This is how the pong ball moves. Essentialy, if the ball hits the top half of the wall,
+the ball will propel up-right or up-left, depending on its initial direction(determined by our bool,
+where a value of true generally moves our ball to the right and up or down, or moves our ball to the
+left and up or down.)
+
+If the ball hits the bottom half of the wall, the ball will travel down-right or down-left.
+
+Mathematics involved:
+Our x transformations will be set in stone, either left or right. To visually change the position of the ball
+we will have to calculate a different y transformation for each collision that makes sense.
+
+
+Distance Formula:
+To determine if the pong ball is hitting the rectangles, perhaps we can EMBED a circle inside the top of the rectangle and bottom of it.
+The circle needs to be small enough to not be seen by the player, and we can base our new direction based on which circle it hits.
+The question now is where will the hit detection take place? Before or after the rectangle moves?
+Let's say before.
+
+3FEB24
+
+20:47 : Time to add movement to player2. This is for debuggin purposes. ^ and V are occupied for player one. Let's try and use
+'q' and 'SPACE' for the up and down. 
+
+21:50 : The movement is ALMOST working.... player2 is FAST AF DAWG. Gotta be smart about updating the game speed. 
