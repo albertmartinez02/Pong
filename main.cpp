@@ -36,12 +36,14 @@ int main()
     //Players
     sf::RectangleShape player;
     player.setSize(sf::Vector2f{ 90 , 25 });
+    player.setOrigin(sf::Vector2f{ 45 , 13 }); //Useful for keeping hit_points inside rectangle
     player.setFillColor(sf::Color::White);
     player.setRotation(90);
     player.setPosition(window_boundaries.x / 30, window_boundaries.y / 2);
 
     sf::RectangleShape player2;
     player2.setSize(sf::Vector2f{ 90 , 25 });
+    player2.setOrigin(sf::Vector2f{ 45 , 13 });
     player2.setFillColor(sf::Color::White);
     player2.setRotation(90);
     player2.setPosition(window_boundaries.x - window_boundaries.x / 30, window_boundaries.y / 2);
@@ -50,10 +52,10 @@ int main()
     sf::CircleShape hit_points[4];
     hit_points[0].setRadius(5);
     hit_points[0].setFillColor(sf::Color::White);
-    hit_points[0].setPosition(window_boundaries.x / 30 - 20, window_boundaries.y / 2);
+    hit_points[0].setPosition(player.getPosition().x, player.getPosition().y + 30);
     hit_points[1].setRadius(5);
     hit_points[1].setFillColor(sf::Color::White);
-    hit_points[1].setPosition(window_boundaries.x / 30 - 20, window_boundaries.y / 2 + 80);
+    hit_points[1].setPosition(player.getPosition().x, player.getPosition().y - 30);
     hit_points[2].setRadius(5);
     hit_points[2].setFillColor(sf::Color::White);
     hit_points[2].setPosition(window_boundaries.x - window_boundaries.x / 30 - 10, window_boundaries.y / 2);
