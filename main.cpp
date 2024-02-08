@@ -149,12 +149,12 @@ int main()
         ball.move(x_move, y_move);
 
         //Player movement
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) && player.getPosition().y > 0) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && player.getPosition().y > 0) {
             player.move(0, -game_speed);
             hit_points[0].move(0, -game_speed);
             hit_points[1].move(0, -game_speed);
         }
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && player.getPosition().y + player.getSize().y
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && player.getPosition().y + player.getSize().y
                 <= window_boundaries.y - 90) {
             player.move(0, game_speed);
             hit_points[1].move(0, game_speed);
