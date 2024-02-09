@@ -1,4 +1,5 @@
 #define SFML_DEFINE_DISCRETE_GPU_PREFERENCE
+#define GAME_SPEED 20
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -24,7 +25,7 @@ int main()
 
     window.setVerticalSyncEnabled(true); // Limit framerate for higher quality
 
-    //Use this to get boundaries of the window space. Use for collisions!
+    //Use this to get boundaries of the window space. Use for collisions, and for out of bounds
     sf::Vector2u window_boundaries = window.getSize();
 
     //Pong ball
@@ -33,13 +34,18 @@ int main()
     ball.setFillColor(sf::Color::White);
     ball.setPosition(window_boundaries.x / 2 , window_boundaries.y / 2);
     
-    //Players
+
+    //Players and hit detection lines creation
     sf::RectangleShape player;
     player.setSize(sf::Vector2f{ 90 , 25 });
+    sf::RectangleShape player_hit_detection(sf::Vector2f{ 90,2 }); 
+
     player.setOrigin(sf::Vector2f{ 45 , 13 }); //Useful for keeping hit_points inside rectangle
     player.setFillColor(sf::Color::White);
     player.setRotation(90);
+    player_hit_detection.setRotation(90);
     player.setPosition(window_boundaries.x / 30, window_boundaries.y / 2);
+    player_hit_detection.setPosition(player.getPosition()); //line is flush with player origin, right side
 
     sf::RectangleShape player2;
     player2.setSize(sf::Vector2f{ 90 , 25 });
@@ -49,19 +55,17 @@ int main()
     player2.setPosition(window_boundaries.x - window_boundaries.x / 30, window_boundaries.y / 2);
 
     //Embedded circleshapes into players for hit detection
+    
     sf::CircleShape hit_points[4];
     hit_points[0].setRadius(5);
-    hit_points[0].setFillColor(sf::Color::White);
-    hit_points[0].setPosition(player.getPosition().x, player.getPosition().y + 30);
+    hit_points[0].setPosition(player.getPosition().x + (player.getSize().y / 2), player.getPosition().y + 30);
     hit_points[1].setRadius(5);
-    hit_points[1].setFillColor(sf::Color::White);
-    hit_points[1].setPosition(player.getPosition().x, player.getPosition().y - 30);
+    hit_points[1].setPosition(player.getPosition().x + (player.getSize().y / 2), player.getPosition().y - 30);
     hit_points[2].setRadius(5);
-    hit_points[2].setFillColor(sf::Color::White);
-    hit_points[2].setPosition(window_boundaries.x - window_boundaries.x / 30 - 10, window_boundaries.y / 2);
+    hit_points[2].setPosition(player2.getPosition().x - (player2.getSize().y / 2), player2.getPosition().y + 30);
     hit_points[3].setRadius(5);
-    hit_points[3].setFillColor(sf::Color::White);
-    hit_points[3].setPosition(window_boundaries.x - window_boundaries.x / 30 - 10, window_boundaries.y / 2 + 80);
+    hit_points[3].setPosition(player2.getPosition().x - (player2.getSize().y / 2), player2.getPosition().y - 30);
+
 
     //window.getSize().y / 40 so we can create a rectangle length 20, then 20 pixels of space for the next one
     int rectangles = window_boundaries.y / 40;
@@ -74,6 +78,7 @@ int main()
         separator[i].setRotation(90);
         separator[i].setFillColor(sf::Color::White);
         separator[i].setPosition(window.getSize().x / 2, j);
+        std::cout << separator[i].getPosition().x << " " << separator[i].getPosition().y << std::endl;
         j += 40;
     }
 
@@ -84,19 +89,21 @@ int main()
     std::uniform_int_distribution<int> dist(1, 9);
     
     //Game speed = player speed, x / y direction determines starting direction
-    float game_speed = 5.0;
+    float game_speed = 8.0;
     bool x_direction =  dist(generator) % 2;
     bool y_direction = dist(generator) % 2;
 
     //x_move / y_move determine ball movement and speed.
-    float x_move = game_speed , y_move = game_speed;
-   
+    float x_move, y_move;
+    (x_direction == false) ? x_move = -game_speed : x_move = game_speed;
+    (y_direction == false) ? y_move = -game_speed : y_move = game_speed;
+
     sf::Clock clock;
     sf::Int32 time_passed = 5000; //in milliseconds
 
     //Thread for player2, ends execution once game_end
     bool game_end = false;
-    std::thread t(player2_movement, std::ref(player2), std::ref(window_boundaries), std::ref(game_speed), 
+    std::thread t(player2_movement, std::ref(player2), std::ref(window_boundaries), std::ref(game_speed),
                   std::ref(game_end), hit_points);
 
     short player1_score = 0 , player2_score = 0;
@@ -119,9 +126,6 @@ int main()
             window.draw(separator[i]);
         }
         
-        for (int i = 0; i < 4; i++) {
-            window.draw(hit_points[i]);
-        }
 
         window.draw(ball);
 
@@ -149,19 +153,19 @@ int main()
         ball.move(x_move, y_move);
 
         //Player movement
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && player.getPosition().y > 0) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && player.getPosition().y - 45 > 0) {
             player.move(0, -game_speed);
             hit_points[0].move(0, -game_speed);
             hit_points[1].move(0, -game_speed);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && player.getPosition().y + player.getSize().y
-                <= window_boundaries.y - 90) {
+                <= window_boundaries.y - 35) {
             player.move(0, game_speed);
             hit_points[1].move(0, game_speed);
             hit_points[0].move(0, game_speed);
         }
 
-       if (game_speed < 15 && clock.getElapsedTime().asMilliseconds() > time_passed) {
+        if (game_speed < 15 && clock.getElapsedTime().asMilliseconds() > time_passed) {
             game_speed += 1;
             if (x_move < 0) {
                 --x_move;
@@ -177,12 +181,13 @@ int main()
             }
             time_passed += 5000;
         }
-
+        
        window.display();
-
+       
+        
        if (ball.getPosition().x + ball.getRadius() >= window_boundaries.x) {
            ++player1_score;
-           std::cout << "Player1: " << player1_score << std::endl; /*Debug*/
+           std::cout << "Player1: " << player1_score << std::endl; 
            clock.restart();
            reset_game(ball, window_boundaries, game_speed, time_passed,
                       x_move , y_move);
@@ -190,7 +195,7 @@ int main()
        }
        else if (ball.getPosition().x - ball.getRadius() <= 0) {
            ++player2_score;
-           std::cout << "Player2: " << player2_score << std::endl; /*Debug*/
+           std::cout << "Player2: " << player2_score << std::endl; 
            clock.restart();
            reset_game(ball, window_boundaries, game_speed, time_passed,
                       x_move, y_move);
@@ -214,7 +219,7 @@ const float distance(sf::Vector2f p1, sf::Vector2f p2) {
 void reset_game(sf::CircleShape& ball, sf::Vector2u& window_boundaries, float& game_speed, sf::Int32& game_time,
                 float& x_move, float& y_move) {
     ball.setPosition(window_boundaries.x / 2, window_boundaries.y / 2);
-    game_speed = 5.0;
+    game_speed = 8.0;
     x_move = game_speed;
     y_move = game_speed;
     game_time = 5000;
@@ -230,7 +235,7 @@ void player2_movement(sf::RectangleShape& player2, sf::Vector2u& window_boundari
 
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && player2.getPosition().y + player2.getSize().y
-            <= window_boundaries.y - 90) {
+            <= window_boundaries.y - 35) {
             player2.move(0, game_speed);
             hit_points[2].move(0, game_speed);
             hit_points[3].move(0, game_speed);
