@@ -13,7 +13,8 @@ const float distance(const sf::Vector2f, const sf::Vector2f);
 
 //Game reset after a score
 void reset_game(sf::CircleShape& ball, sf::Vector2u& window_boundaries, float& game_speed,  sf::Int32& game_time,
-                float& x_move , float& y_move);
+                float& x_move , float& y_move, bool& x_direction, bool& y_direction,
+                std::random_device& rd , std::uniform_int_distribution<int>& uid);
 
 void player2_movement(sf::RectangleShape& player2, sf::Vector2u& window_boundaries, float& game_speed,
                       bool& game_end, sf::CircleShape hit_points[]);
@@ -83,10 +84,12 @@ int main()
     }
 
 
-    //Random library to randomly generate direction ball will start in
+    //Random library to randomly generate direction ball will start in,
+    //and randomly shoot ball from different points on the y-axis after each score
     
     std::random_device generator;
     std::uniform_int_distribution<int> dist(1, 9);
+    std::uniform_int_distribution<int> dist2(2, window_boundaries.y);
     
     //Game speed = player speed, x / y direction determines starting direction
     float game_speed = 8.0;
@@ -190,7 +193,8 @@ int main()
            std::cout << "Player1: " << player1_score << std::endl; 
            clock.restart();
            reset_game(ball, window_boundaries, game_speed, time_passed,
-                      x_move , y_move);
+                      x_move , y_move, x_direction, y_direction,
+                      generator , dist2);
            //Sleep(10);
        }
        else if (ball.getPosition().x - ball.getRadius() <= 0) {
@@ -198,7 +202,8 @@ int main()
            std::cout << "Player2: " << player2_score << std::endl; 
            clock.restart();
            reset_game(ball, window_boundaries, game_speed, time_passed,
-                      x_move, y_move);
+                      x_move, y_move, x_direction, y_direction,
+                      generator , dist2);
            //Sleep(10);
        }
 
@@ -216,12 +221,22 @@ const float distance(sf::Vector2f p1, sf::Vector2f p2) {
     return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
 
+
+//Still need to randomize the starting ball and movement after every score
 void reset_game(sf::CircleShape& ball, sf::Vector2u& window_boundaries, float& game_speed, sf::Int32& game_time,
-                float& x_move, float& y_move) {
-    ball.setPosition(window_boundaries.x / 2, window_boundaries.y / 2);
+                float& x_move, float& y_move, bool& x_direction, bool& y_direction,
+                std::random_device& rd, std::uniform_int_distribution<int>& uid) {
+    ball.setPosition(window_boundaries.x / 2, uid(rd));
     game_speed = 8.0;
+
+    x_direction = !x_direction;
+    y_direction = !y_direction;
+    
     x_move = game_speed;
     y_move = game_speed;
+    x_move *= -1;
+    y_move *= -1;
+
     game_time = 5000;
 }
 
