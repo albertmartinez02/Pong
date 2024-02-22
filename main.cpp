@@ -232,10 +232,8 @@ void reset_game(sf::CircleShape& ball, sf::Vector2u& window_boundaries, float& g
     x_direction = !x_direction;
     y_direction = !y_direction;
     
-    x_move = game_speed;
-    y_move = game_speed;
-    x_move *= -1;
-    y_move *= -1;
+    x_move = (x_direction ? 1 : -1) * game_speed;
+    y_move = (y_direction ? 1 : -1) * game_speed;
 
     game_time = 5000;
 }
