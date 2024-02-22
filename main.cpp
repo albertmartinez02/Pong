@@ -1,5 +1,5 @@
 #define SFML_DEFINE_DISCRETE_GPU_PREFERENCE
-#define GAME_SPEED 20
+#define GAME_SPEED 12
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -45,7 +45,7 @@ int main()
     player.setFillColor(sf::Color::White);
     player.setRotation(90);
     player_hit_detection.setRotation(90);
-    player.setPosition(window_boundaries.x / 30, window_boundaries.y / 2);
+    player.setPosition(window_boundaries.x / 35, window_boundaries.y / 2);
     player_hit_detection.setPosition(player.getPosition()); //line is flush with player origin, right side
 
     sf::RectangleShape player2;
@@ -53,7 +53,7 @@ int main()
     player2.setOrigin(sf::Vector2f{ 45 , 13 });
     player2.setFillColor(sf::Color::White);
     player2.setRotation(90);
-    player2.setPosition(window_boundaries.x - window_boundaries.x / 30, window_boundaries.y / 2);
+    player2.setPosition(window_boundaries.x - window_boundaries.x / 35, window_boundaries.y / 2);
 
     //Embedded circleshapes into players for hit detection
     
@@ -92,7 +92,7 @@ int main()
     std::uniform_int_distribution<int> dist2(2, window_boundaries.y);
     
     //Game speed = player speed, x / y direction determines starting direction
-    float game_speed = 8.0;
+    float game_speed = GAME_SPEED;
     bool x_direction =  dist(generator) % 2;
     bool y_direction = dist(generator) % 2;
 
@@ -168,22 +168,6 @@ int main()
             hit_points[0].move(0, game_speed);
         }
 
-        if (game_speed < 15 && clock.getElapsedTime().asMilliseconds() > time_passed) {
-            game_speed += 1;
-            if (x_move < 0) {
-                --x_move;
-            }
-            else {
-                ++x_move;
-            }
-            if (y_move < 0) {
-                --y_move;
-            }
-            else {
-                ++y_move;
-            }
-            time_passed += 5000;
-        }
         
        window.display();
        
@@ -227,8 +211,6 @@ void reset_game(sf::CircleShape& ball, sf::Vector2u& window_boundaries, float& g
                 float& x_move, float& y_move, bool& x_direction, bool& y_direction,
                 std::random_device& rd, std::uniform_int_distribution<int>& uid) {
     ball.setPosition(window_boundaries.x / 2, uid(rd));
-    game_speed = 8.0;
-
     x_direction = !x_direction;
     y_direction = !y_direction;
     
