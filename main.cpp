@@ -83,6 +83,14 @@ int main()
         j += 40;
     }
 
+    //Main Menu
+    sf::Font font;
+    font.loadFromFile("AGENCYR.TFF");
+
+    sf::Text text;
+    text.setFont(font);
+
+
 
     //Random library to randomly generate direction ball will start in,
     //and randomly shoot ball from different points on the y-axis after each score
