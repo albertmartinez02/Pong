@@ -7,6 +7,8 @@
 #include <vector>
 #include <thread>
 #include <cmath>
+#include "menu.h"
+
 
 //Distance formula
 const float distance(const sf::Vector2f, const sf::Vector2f);
@@ -84,13 +86,21 @@ int main()
     }
 
     //Main Menu
+    bool mainMenu = true;
     sf::Font font;
     font.loadFromFile("AGENCYR.TFF");
 
     sf::Text text;
     text.setFont(font);
+    text.setString("PONG");
+    text.setLetterSpacing(2);
+    text.setFillColor(sf::Color::White);
 
-
+    sf::Text prompt;
+    prompt.setFont(font);
+    prompt.setString("Press Enter to play a round and Q to exit the game");
+    prompt.setPosition(window_boundaries.x / 4, window_boundaries.y / 4);
+    prompt.setFillColor(sf::Color::White);
 
     //Random library to randomly generate direction ball will start in,
     //and randomly shoot ball from different points on the y-axis after each score
@@ -132,6 +142,24 @@ int main()
         }
 
         window.clear(sf::Color::Black);
+
+        if (mainMenu) {
+            window.draw(text);
+            window.draw(prompt);
+            window.display();
+            while (true) {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+                    !mainMenu;
+                    break;
+                }
+                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+                    !mainMenu;
+                    window.close();
+                    break;
+                }
+            }
+
+        }
 
         for (int i = 0; i < rectangles; i++) {
             window.draw(separator[i]);
@@ -182,7 +210,6 @@ int main()
         
        if (ball.getPosition().x + ball.getRadius() >= window_boundaries.x) {
            ++player1_score;
-           std::cout << "Player1: " << player1_score << std::endl; 
            clock.restart();
            reset_game(ball, window_boundaries, game_speed, time_passed,
                       x_move , y_move, x_direction, y_direction,
@@ -191,12 +218,10 @@ int main()
        }
        else if (ball.getPosition().x - ball.getRadius() <= 0) {
            ++player2_score;
-           std::cout << "Player2: " << player2_score << std::endl; 
            clock.restart();
            reset_game(ball, window_boundaries, game_speed, time_passed,
                       x_move, y_move, x_direction, y_direction,
                       generator , dist2);
-           //Sleep(10);
        }
 
     }
